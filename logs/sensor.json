@@ -1,0 +1,21 @@
+{"timestamp": "2026-02-07T21:27:58.644700", "temperature": 20.5, "humidity": 35.1, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:28:00.700272", "temperature": null, "humidity": null, "gpio_pin": 4, "success": false, "error_message": "None値取得 (T:None, H:None)"}
+{"timestamp": "2026-02-07T21:28:59.498871", "temperature": 20.5, "humidity": 35.1, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:29:01.055306", "temperature": 20.5, "humidity": 35.3, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:29:59.852618", "temperature": 20.5, "humidity": 35.3, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:31:00.206240", "temperature": 20.5, "humidity": 35.4, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:32:01.060026", "temperature": 20.5, "humidity": 35.4, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:33:01.413708", "temperature": 20.5, "humidity": 35.4, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:34:01.767265", "temperature": 20.5, "humidity": 35.5, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:35:02.120861", "temperature": 20.5, "humidity": 35.4, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:36:02.474520", "temperature": 20.5, "humidity": 35.4, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:37:02.828067", "temperature": 20.5, "humidity": 35.6, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:38:03.182363", "temperature": 20.4, "humidity": 35.7, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:39:07.208057", "temperature": 20.4, "humidity": 35.7, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:40:45.707415", "temperature": null, "humidity": null, "gpio_pin": 4, "success": false, "error_message": "None値取得 (T:None, H:None)"}
+{"timestamp": "2026-02-07T21:41:58.160127", "temperature": null, "humidity": null, "gpio_pin": 4, "success": false, "error_message": "None値取得 (T:None, H:None)"}
+{"timestamp": "2026-02-07T21:42:59.707519", "temperature": null, "humidity": null, "gpio_pin": 4, "success": false, "error_message": "None値取得 (T:None, H:None)"}
+{"timestamp": "2026-02-07T21:44:01.061974", "temperature": null, "humidity": null, "gpio_pin": 4, "success": false, "error_message": "None値取得 (T:None, H:None)"}
+{"timestamp": "2026-02-07T21:45:01.417127", "temperature": 20.4, "humidity": 35.8, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:46:01.780929", "temperature": 20.4, "humidity": 35.8, "gpio_pin": 4, "success": true, "error_message": null}
+{"timestamp": "2026-02-07T21:47:02.134854", "temperature": 20.4, "humidity": 35.7, "gpio_pin": 4, "success": true, "error_message": null}
