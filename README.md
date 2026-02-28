@@ -191,13 +191,7 @@ tail -f ~/src/sensor/logs/service.log
 
 ```bash
 source .venv/bin/activate
-python3 utils/upload_sensor_log.py
-```
-
-または：
-
-```bash
-python3 -m utils.upload_sensor_log
+/home/dahlia1209/src/sensor/scripts/upload_all_logs.sh
 ```
 
 ### cronで15分ごとに自動アップロード
@@ -205,7 +199,7 @@ python3 -m utils.upload_sensor_log
 #### 1. スクリプトに実行権限を付与
 
 ```bash
-chmod +x ~/src/sensor/scripts/upload_log.sh
+chmod +x /home/dahlia1209/src/sensor/scripts/upload_all_logs.sh
 ```
 
 #### 2. crontabを編集
@@ -217,7 +211,7 @@ crontab -e
 #### 3. 以下の行を追加（パスは自分の環境に合わせて変更）
 
 ```cron
-*/15 * * * * cd /home/dahlia1209/src/sensor && ./scripts/upload_log.sh >> logs/cron.log 2>&1
+*/15 * * * * /home/dahlia1209/src/sensor/scripts/upload_all_logs.sh
 ```
 
 #### 4. 設定を確認
@@ -232,23 +226,6 @@ crontab -l
 tail -f ~/src/sensor/logs/cron.log
 ```
 
-### JSONログもアップロードする場合（オプション）
-
-JSONログも別のBlobにアップロードしたい場合：
-
-```bash
-crontab -e
-```
-
-以下を追加：
-
-```cron
-# テキストログのアップロード
-*/15 * * * * cd /home/dahlia1209/src/sensor && ./scripts/upload_log.sh >> logs/cron.log 2>&1
-
-# JSONログのアップロード
-*/15 * * * * cd /home/dahlia1209/src/sensor && SENSOR_LOG_FILE=logs/sensor.json AZURE_BLOB_NAME=sensor-data/sensor.json ./scripts/upload_log.sh >> logs/cron.log 2>&1
-```
 
 ## プロジェクト構造
 
@@ -302,60 +279,6 @@ sensor/
 
 各行が1つのJSONオブジェクトです（JSONL形式）。Python、jq、各種データ分析ツールで簡単に処理できます。
 
-### JSON活用例
-
-**jqで最新10件の温度を表示:**
-```bash
-tail -n 10 ~/src/sensor/logs/sensor.json | jq -r '.temperature'
-```
-
-**jqで最新データを整形表示:**
-```bash
-tail -n 1 ~/src/sensor/logs/sensor.json | jq '.'
-```
-
-**Pythonで読み込んで分析:**
-```python
-import json
-import pandas as pd
-
-# JSONログを読み込み
-data = []
-with open('logs/sensor.json', 'r') as f:
-    for line in f:
-        data.append(json.loads(line))
-
-# DataFrameに変換
-df = pd.DataFrame(data)
-df['timestamp'] = pd.to_datetime(df['timestamp'])
-
-# 成功したデータのみで統計
-success_df = df[df['success'] == True]
-print(f"平均温度: {success_df['temperature'].mean():.1f}°C")
-print(f"平均湿度: {success_df['humidity'].mean():.1f}%")
-print(f"最高温度: {success_df['temperature'].max():.1f}°C")
-print(f"最低温度: {success_df['temperature'].min():.1f}°C")
-```
-
-**最新データをJSONで取得:**
-```bash
-tail -n 1 ~/src/sensor/logs/sensor.json | jq '.'
-```
-
-**特定期間のデータを抽出:**
-```bash
-cat ~/src/sensor/logs/sensor.json | jq 'select(.timestamp >= "2026-02-07T10:00:00")'
-```
-
-**成功したデータのみ抽出:**
-```bash
-cat ~/src/sensor/logs/sensor.json | jq 'select(.success == true)'
-```
-
-**CSVに変換:**
-```bash
-cat ~/src/sensor/logs/sensor.json | jq -r '[.timestamp, .temperature, .humidity, .success] | @csv'
-```
 
 ### 統計サマリーの例
 
@@ -381,81 +304,6 @@ cat ~/src/sensor/logs/sensor.json | jq -r '[.timestamp, .temperature, .humidity,
 ======================================================================
 ```
 
-## トラブルシューティング
-
-### センサーが読み取れない場合
-
-1. **配線を確認**
-   - VCC → 5V
-   - DATA → GPIO4 (物理ピン7)
-   - GND → GND
-
-2. **GPIO診断スクリプトを実行**（blockchain-projectから）:
-```bash
-python3 ~/blockchain-project/scripts/gpio_diagnostic.py
-```
-
-3. **センサーの向きを確認**
-   - 穴（グリッド）が手前、ピンが下
-
-4. **別のGPIOピンを試す**
-```bash
-# .envで変更
-SENSOR_GPIO=17
-```
-
-### アップロードが失敗する場合
-
-1. **環境変数を確認:**
-```bash
-cat .env | grep AZURE
-```
-
-2. **アップロードログを確認:**
-```bash
-cat ~/src/sensor/logs/upload.log
-```
-
-3. **手動でアップロードテスト:**
-```bash
-source .venv/bin/activate
-python3 -m utils.upload_sensor_log
-```
-
-4. **接続文字列の形式を確認:**
-```
-AZURE_STORAGE_CONNECTION_STRING=DefaultEndpointsProtocol=https;AccountName=...
-```
-
-### サービスが起動しない場合
-
-1. **サービスログを確認:**
-```bash
-sudo journalctl -u sensor-monitor -n 50
-```
-
-2. **パスを確認:**
-```bash
-sudo systemctl cat sensor-monitor.service
-```
-
-3. **手動実行でエラーを確認:**
-```bash
-cd ~/src/sensor
-source .venv/bin/activate
-python3 main.py
-```
-
-### モジュールインポートエラー
-
-```bash
-# プロジェクトルートから実行
-cd ~/src/sensor
-python3 main.py
-
-# またはモジュールとして実行
-python3 -m utils.upload_sensor_log
-```
 
 ## システム全体の動作
 
