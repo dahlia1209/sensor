@@ -10,6 +10,7 @@ AM2302/DHT22温湿度センサーからデータを収集し、Azure Blob Storag
   - **機械処理しやすいJSON形式** (`sensor.json`)
 - 統計情報の自動計算と定期出力
 - Azure Blob Storage への差分アップロード（15分ごと）
+- ダッシュボード用 `index.html` のアップロード
 - systemdサービスによる自動起動・常時稼働
 - エラーハンドリングとリトライ機能
 
@@ -128,6 +129,8 @@ StandardError=append:/home/dahlia1209/src/sensor/logs/service.log
 WantedBy=multi-user.target
 ```
 
+> ⚠️ **注意**: サービスは必ず `sudo systemctl` 経由で操作してください。`sudo python3 main.py` のように直接実行すると `service.log` が root 所有になり、次回サービス起動時に `sensor.json` への書き込みが失敗する原因になります。
+
 #### サービスの有効化と起動
 
 ```bash
@@ -187,7 +190,7 @@ tail -f ~/src/sensor/logs/service.log
 
 ## 定期アップロード設定
 
-### 手動アップロード
+### 手動アップロード（センサーログ）
 
 ```bash
 source .venv/bin/activate
@@ -220,12 +223,33 @@ crontab -e
 crontab -l
 ```
 
-#### 5. cronログの確認
+#### 5. アップロードログの確認
 
 ```bash
-tail -f ~/src/sensor/logs/cron.log
+tail -f ~/src/sensor/logs/upload_all.log
 ```
 
+## ダッシュボード (index.html) のアップロード
+
+`html/index.html` を `sensor-logs` コンテナのルートに Block Blob としてアップロードします。センサーデータ (`sensor.json`) とは独立したスクリプトで管理します。
+
+### 初回セットアップ
+
+```bash
+chmod +x /home/dahlia1209/src/sensor/scripts/upload_html.sh
+```
+
+### 手動アップロード
+
+```bash
+./scripts/upload_html.sh
+```
+
+### アップロードログの確認
+
+```bash
+tail -f ~/src/sensor/logs/upload_html.log
+```
 
 ## プロジェクト構造
 
@@ -237,6 +261,8 @@ sensor/
 ├── README.md                  # このファイル
 ├── requirements.txt           # 依存パッケージ
 ├── main.py                    # メインプログラム
+├── html/
+│   └── index.html            # ダッシュボード画面
 ├── models/
 │   ├── __init__.py
 │   └── sensor.py             # データモデル
@@ -246,16 +272,19 @@ sensor/
 ├── utils/
 │   ├── __init__.py
 │   ├── logging_config.py     # ロギング設定
-│   └── upload_sensor_log.py  # BLOBアップロード
+│   ├── upload_sensor_log.py  # センサーログのBLOBアップロード
+│   └── upload_html.py        # index.htmlのBLOBアップロード
 ├── scripts/
-│   └── upload_log.sh         # アップロードスクリプト
+│   ├── upload_all_logs.sh    # センサーログ一括アップロードスクリプト
+│   └── upload_html.sh        # index.htmlアップロードスクリプト
 └── logs/
     ├── .gitkeep
     ├── sensor.log            # センサーログ（テキスト形式、自動生成）
     ├── sensor.json           # センサーログ（JSON形式、自動生成）
     ├── service.log           # systemdサービスログ（自動生成）
     ├── upload.log            # アップロードログ（自動生成）
-    ├── cron.log              # cronログ（自動生成）
+    ├── upload_all.log        # 一括アップロードログ（自動生成）
+    ├── upload_html.log       # HTMLアップロードログ（自動生成）
     └── .sensor.log.position  # アップロード位置記録（自動生成）
 ```
 
@@ -278,7 +307,6 @@ sensor/
 ```
 
 各行が1つのJSONオブジェクトです（JSONL形式）。Python、jq、各種データ分析ツールで簡単に処理できます。
-
 
 ### 統計サマリーの例
 
@@ -304,19 +332,19 @@ sensor/
 ======================================================================
 ```
 
-
 ## システム全体の動作
 
 完成したシステムの動作フロー：
 
 1. **センサー監視**: systemdで常時稼働（60秒間隔で読み取り）
-2. **ログ記録**: 
+2. **ログ記録**:
    - テキスト形式 → `sensor.log`（人間が読む用）
    - JSON形式 → `sensor.json`（プログラム処理用）
    - 10MBごとに自動ローテーション
 3. **統計出力**: 10回ごとに統計サマリー表示
 4. **Azure同期**: 15分ごとに差分アップロード（cronで自動実行）
-5. **自動起動**: Raspberry Pi再起動後も自動で開始
+5. **ダッシュボード**: `index.html` を手動アップロード、`sensor.json` を参照して可視化
+6. **自動起動**: Raspberry Pi再起動後も自動で開始
 
 ## システムステータス確認
 
@@ -335,6 +363,37 @@ crontab -l
 
 # ログファイル一覧
 ls -lh ~/src/sensor/logs/
+
+# ログファイルの所有者確認（root所有になっていないか）
+ls -l ~/src/sensor/logs/service.log
+```
+
+## トラブルシューティング
+
+### sensor.json が更新されない
+
+`service.log` が root 所有になっていると、`sensor.json` への書き込みに失敗することがあります。
+
+```bash
+# 所有者を確認
+ls -l ~/src/sensor/logs/service.log
+
+# root所有の場合は修正して再起動
+sudo chown dahlia1209:dahlia1209 ~/src/sensor/logs/service.log
+sudo systemctl restart sensor-monitor
+```
+
+### cronが動いているか確認
+
+```bash
+# cronサービスの状態
+sudo systemctl status cron
+
+# cronの実行履歴
+sudo journalctl -u cron | tail -20
+
+# アップロードログで実行結果を確認
+tail -f ~/src/sensor/logs/upload_all.log
 ```
 
 ## パフォーマンス

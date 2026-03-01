@@ -4,66 +4,132 @@ import time
 
 IR_TX_PIN = 18
 
-def send_nec_raw_binary(pi, gpio, binary_str):
+def send_raw_pulses(pi, gpio, pulses):
     pi.set_mode(gpio, pigpio.OUTPUT)
-    pi.write(gpio, 0) 
+    pi.write(gpio, 0)
+    
     wf = []
-
+    
     def add_mark(duration_us):
         cycles = int(duration_us / 26)
         for _ in range(cycles):
             wf.append(pigpio.pulse(1 << gpio, 0, 13))
             wf.append(pigpio.pulse(0, 1 << gpio, 13))
-
+    
     def add_space(duration_us):
         wf.append(pigpio.pulse(0, 1 << gpio, duration_us))
-
-    add_mark(9000)
-    add_space(4500)
-
-    for bit_char in binary_str:
-        add_mark(560)
-        if bit_char == '1':
-            add_space(1690)
+    
+    for level, duration in pulses:
+        if duration > 15000:
+            duration = 10000
+        if level == 1:
+            add_mark(duration)
         else:
-            add_space(560)
-
-    add_mark(560)
-
+            add_space(duration)
+    
     pi.wave_clear()
     pi.wave_add_generic(wf)
     wid = pi.wave_create()
-
     if wid >= 0:
         pi.wave_send_once(wid)
         while pi.wave_tx_busy():
             time.sleep(0.001)
         pi.wave_delete(wid)
-
+    
     pi.write(gpio, 0)
 
-pi = pigpio.pi()
 
-# ★順序を元のリモコンに合わせて修正
-signals = [
-    {
-        "binary": "00110000010100000000011000000011",
-        "label": "Signal 1",
-        "full_code": "0x30500603",
-    },
-    {
-        "binary": "00000000000100000000000000000111",
-        "label": "Signal 2",
-        "full_code": "0x00100007",
-    },
+pi = pigpio.pi()
+if not pi.connected:
+    raise RuntimeError("pigpioデーモンに接続できません。'sudo pigpiod'を実行してください。")
+
+# 1フレーム目
+raw_pulses_1 = [
+    (1, 8985), (0, 4515),
+    (1, 625), (0, 580),
+    (1, 650), (0, 555),
+    (1, 625), (0, 1680),
+    (1, 655), (0, 1655),
+    (1, 625), (0, 580),
+    (1, 650), (0, 560),
+    (1, 620), (0, 580),
+    (1, 625), (0, 585),
+    (1, 655), (0, 1650),
+    (1, 650), (0, 555),
+    (1, 625), (0, 580),
+    (1, 655), (0, 1655),
+    (1, 640), (0, 570),
+    (1, 620), (0, 580),
+    (1, 625), (0, 580),
+    (1, 655), (0, 550),
+    (1, 630), (0, 580),
+    (1, 625), (0, 580),
+    (1, 625), (0, 580),
+    (1, 625), (0, 580),
+    (1, 625), (0, 580),
+    (1, 650), (0, 1660),
+    (1, 650), (0, 1655),
+    (1, 650), (0, 555),
+    (1, 650), (0, 555),
+    (1, 630), (0, 580),
+    (1, 650), (0, 550),
+    (1, 655), (0, 555),
+    (1, 645), (0, 560),
+    (1, 650), (0, 555),
+    (1, 650), (0, 1655),
+    (1, 630), (0, 1680),
+    (1, 650), (0, 1655),
+    (1, 625), (0, 1685),
+    (1, 645), (0, 1660),
+    (1, 650), (0, 10000),
 ]
 
-for sig in signals:
-    print(f"Sending {sig['label']} (Full code: {sig['full_code']})")
-    print(f"Binary: {sig['binary']}")
-    send_nec_raw_binary(pi, IR_TX_PIN, sig["binary"])
-    print(f"{sig['label']} sent!")
-    time.sleep(0.167)
+# 2フレーム目
+raw_pulses_2 = [
+    (1, 8985), (0, 4490),
+    (1, 645), (0, 560),
+    (1, 645), (0, 560),
+    (1, 650), (0, 555),
+    (1, 650), (0, 555),
+    (1, 650), (0, 555),
+    (1, 650), (0, 560),
+    (1, 645), (0, 560),
+    (1, 620), (0, 585),
+    (1, 625), (0, 580),
+    (1, 650), (0, 555),
+    (1, 650), (0, 560),
+    (1, 645), (0, 1660),
+    (1, 645), (0, 560),
+    (1, 645), (0, 565),
+    (1, 645), (0, 555),
+    (1, 650), (0, 560),
+    (1, 645), (0, 560),
+    (1, 625), (0, 580),
+    (1, 625), (0, 580),
+    (1, 645), (0, 560),
+    (1, 650), (0, 555),
+    (1, 650), (0, 560),
+    (1, 645), (0, 560),
+    (1, 645), (0, 560),
+    (1, 650), (0, 555),
+    (1, 650), (0, 555),
+    (1, 625), (0, 585),
+    (1, 620), (0, 605),
+    (1, 625), (0, 560),
+    (1, 650), (0, 1680),
+    (1, 600), (0, 1705),
+    (1, 625), (0, 1665),
+    (1, 645), (0, 1680),
+    (1, 625), (0, 1660),
+    (1, 620), (0, 1710),
+    (1, 600), (0, 10000),
+]
 
-print("All signals sent!")
+print("1フレーム目送信...")
+send_raw_pulses(pi, IR_TX_PIN, raw_pulses_1)
+time.sleep(0.167)
+print("2フレーム目送信...")
+send_raw_pulses(pi, IR_TX_PIN, raw_pulses_2)
+print("Done!")
+
 pi.stop()
