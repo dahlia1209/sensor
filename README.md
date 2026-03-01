@@ -281,6 +281,142 @@ print('削除完了。残りのキー:', list(codes.keys()))
 "
 ```
 
+## スマートリモコン Web アプリ
+
+FastAPI + ngrok を使ってスマホのブラウザからエアコン・照明・テレビを操作できるWebアプリです。
+
+### インストール
+
+```bash
+pip install fastapi uvicorn --break-system-packages
+```
+
+### ngrok のセットアップ
+
+1. [ngrok.com](https://ngrok.com) でアカウント作成・Authtokenを取得
+
+```bash
+# ngrokインストール
+curl -sSL https://ngrok-agent.s3.amazonaws.com/ngrok.asc | sudo tee /etc/apt/trusted.gpg.d/ngrok.asc >/dev/null
+echo "deb https://ngrok-agent.s3.amazonaws.com buster main" | sudo tee /etc/apt/sources.list.d/ngrok.list
+sudo apt update && sudo apt install ngrok
+
+# Authtokenを設定
+ngrok config add-authtoken YOUR_TOKEN
+```
+
+### 手動起動
+
+```bash
+# ターミナル1: FastAPI起動
+cd ~/src/sensor
+uvicorn app:app --host 0.0.0.0 --port 8000
+
+# ターミナル2: ngrok起動
+ngrok http 8000
+```
+
+ngrok起動後に表示される `https://xxxx.ngrok-free.app` のURLにスマホからアクセスします。
+
+### ngrokのURL確認
+
+```bash
+grep "url=" ~/src/sensor/logs/ngrok.log | tail -1
+```
+
+### systemdで自動起動
+
+#### FastAPI サービスファイルの作成
+
+```bash
+sudo nano /etc/systemd/system/smart-remote.service
+```
+
+以下を貼り付け：
+
+```ini
+[Unit]
+Description=Smart Remote FastAPI Server
+After=network.target pigpiod.service
+
+[Service]
+Type=simple
+User=dahlia1209
+WorkingDirectory=/home/dahlia1209/src/sensor
+Environment="PATH=/home/dahlia1209/src/sensor/.venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ExecStart=/home/dahlia1209/src/sensor/.venv/bin/uvicorn app:app --host 0.0.0.0 --port 8000
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/dahlia1209/src/sensor/logs/smart-remote.log
+StandardError=append:/home/dahlia1209/src/sensor/logs/smart-remote.log
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### ngrok サービスファイルの作成
+
+```bash
+sudo nano /etc/systemd/system/ngrok.service
+```
+
+以下を貼り付け：
+
+```ini
+[Unit]
+Description=ngrok Tunnel
+After=network.target smart-remote.service
+
+[Service]
+Type=simple
+User=dahlia1209
+ExecStart=/usr/local/bin/ngrok http 8000 --log=stdout
+Restart=always
+RestartSec=10
+StandardOutput=append:/home/dahlia1209/src/sensor/logs/ngrok.log
+StandardError=append:/home/dahlia1209/src/sensor/logs/ngrok.log
+
+[Install]
+WantedBy=multi-user.target
+```
+
+#### サービスの有効化と起動
+
+```bash
+# systemdをリロード
+sudo systemctl daemon-reload
+
+# 有効化
+sudo systemctl enable smart-remote
+sudo systemctl enable ngrok
+
+# 起動
+sudo systemctl start smart-remote
+sudo systemctl start ngrok
+
+# 状態確認
+sudo systemctl status smart-remote
+sudo systemctl status ngrok
+```
+
+#### サービス管理コマンド
+
+```bash
+# 状態確認
+sudo systemctl status smart-remote
+sudo systemctl status ngrok
+
+# 再起動
+sudo systemctl restart smart-remote
+sudo systemctl restart ngrok
+
+# ログ確認
+tail -f ~/src/sensor/logs/smart-remote.log
+tail -f ~/src/sensor/logs/ngrok.log
+```
+
+> ⚠️ **注意**: ngrok無料プランはラズパイ再起動のたびにURLが変わります。毎回 `grep "url=" ~/src/sensor/logs/ngrok.log | tail -1` でURLを確認してください。
+
 ## 定期アップロード設定
 
 ### 手動アップロード（センサーログ）
@@ -356,6 +492,7 @@ sensor/
 ├── main.py                    # メインプログラム
 ├── irrp.py                    # 赤外線送受信スクリプト（pigpio作者提供）
 ├── codes                      # 学習済み赤外線コード（自動生成）
+├── app.py                     # スマートリモコン WebAPI（FastAPI）
 ├── html/
 │   └── index.html            # ダッシュボード画面
 ├── models/
@@ -380,6 +517,8 @@ sensor/
     ├── upload.log            # アップロードログ（自動生成）
     ├── upload_all.log        # 一括アップロードログ（自動生成）
     ├── upload_html.log       # HTMLアップロードログ（自動生成）
+    ├── smart-remote.log      # スマートリモコンAPIログ（自動生成）
+    ├── ngrok.log             # ngrokログ（自動生成）
     └── .sensor.log.position  # アップロード位置記録（自動生成）
 ```
 
@@ -446,6 +585,8 @@ sensor/
 ```bash
 # サービス状態
 sudo systemctl status sensor-monitor
+sudo systemctl status smart-remote
+sudo systemctl status ngrok
 
 # 最新のセンサーデータ
 tail -n 5 ~/src/sensor/logs/sensor.log
@@ -506,6 +647,8 @@ tail -f ~/src/sensor/logs/upload_all.log
 - ライブラリ: adafruit-circuitpython-dht
 - クラウド: Azure Blob Storage (Append Blob)
 - 赤外線制御: [irrp.py](http://abyz.me.uk/rpi/pigpio/code/irrp_py.zip)（pigpio作者提供）
+- Web API: FastAPI + uvicorn
+- トンネル: ngrok
 
 ## ライセンス
 
