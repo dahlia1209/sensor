@@ -9,11 +9,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.3.1/dist/chartjs-adapter-luxon.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
             --bg-primary: #0a0e27;
@@ -40,38 +36,13 @@
             overflow-x: hidden;
         }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            animation: fadeIn 0.6s ease-out;
-        }
+        .container { max-width: 1400px; margin: 0 auto; animation: fadeIn 0.6s ease-out; }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        .header {
-            margin-bottom: 2.5rem;
-            animation: slideDown 0.5s ease-out;
-        }
+        .header { margin-bottom: 2.5rem; animation: slideDown 0.5s ease-out; }
 
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
 
         .header h1 {
             font-size: 2.5rem;
@@ -111,25 +82,15 @@
         .stat-card::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 0; left: 0; right: 0;
             height: 3px;
             background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
             opacity: 0;
             transition: opacity 0.3s ease;
         }
 
-        .stat-card:hover {
-            transform: translateY(-4px);
-            background: var(--bg-card-hover);
-            border-color: var(--accent-primary);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .stat-card:hover::before {
-            opacity: 1;
-        }
+        .stat-card:hover { transform: translateY(-4px); background: var(--bg-card-hover); border-color: var(--accent-primary); box-shadow: var(--shadow-lg); }
+        .stat-card:hover::before { opacity: 1; }
 
         .stat-card .label {
             font-size: 0.875rem;
@@ -143,11 +104,7 @@
             gap: 0.5rem;
         }
 
-        .stat-card .value-container {
-            display: flex;
-            align-items: baseline;
-            margin-bottom: 0.75rem;
-        }
+        .stat-card .value-container { display: flex; align-items: baseline; margin-bottom: 0.75rem; }
 
         .stat-card .value {
             font-size: 3rem;
@@ -159,70 +116,24 @@
             background-clip: text;
         }
 
-        .stat-card .unit {
-            font-size: 1.5rem;
-            color: var(--text-secondary);
-            margin-left: 0.5rem;
-            font-weight: 500;
-        }
+        .stat-card .unit { font-size: 1.5rem; color: var(--text-secondary); margin-left: 0.5rem; font-weight: 500; }
+        .stat-card .timestamp { font-size: 0.8rem; color: var(--text-secondary); font-family: 'JetBrains Mono', monospace; }
 
-        .stat-card .timestamp {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        .temperature .value { 
-            background: linear-gradient(135deg, #f59e0b, #ef4444);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .humidity .value { 
-            background: linear-gradient(135deg, #06b6d4, #3b82f6);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .success-rate .value { 
-            background: linear-gradient(135deg, #10b981, #06b6d4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .total-readings .value { 
-            background: linear-gradient(135deg, #8b5cf6, #ec4899);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
+        .temperature .value { background: linear-gradient(135deg, #f59e0b, #ef4444); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .humidity .value { background: linear-gradient(135deg, #06b6d4, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 
         .status-indicator {
             display: inline-block;
-            width: 10px;
-            height: 10px;
+            width: 10px; height: 10px;
             border-radius: 50%;
             animation: pulse 2s infinite;
             box-shadow: 0 0 10px currentColor;
         }
 
-        .status-indicator.online {
-            background: var(--accent-success);
-        }
+        .status-indicator.online { background: var(--accent-success); }
+        .status-indicator.offline { background: var(--accent-error); }
 
-        .status-indicator.offline {
-            background: var(--accent-error);
-        }
-
-        @keyframes pulse {
-            0%, 100% { 
-                opacity: 1;
-                transform: scale(1);
-            }
-            50% { 
-                opacity: 0.6;
-                transform: scale(0.95);
-            }
-        }
+        @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.6; transform: scale(0.95); } }
 
         .chart-container {
             background: var(--bg-card);
@@ -233,10 +144,7 @@
             transition: all 0.3s ease;
         }
 
-        .chart-container:hover {
-            border-color: var(--accent-primary);
-            box-shadow: var(--shadow-lg);
-        }
+        .chart-container:hover { border-color: var(--accent-primary); box-shadow: var(--shadow-lg); }
 
         .chart-container h2 {
             font-size: 1.25rem;
@@ -248,24 +156,12 @@
             gap: 0.5rem;
         }
 
-        .chart-wrapper {
-            position: relative;
-            height: 350px;
-        }
+        .chart-wrapper { position: relative; height: 350px; }
 
-        .combined-chart {
-            height: 400px;
-        }
-
-        .loading {
-            text-align: center;
-            padding: 4rem;
-            color: var(--text-secondary);
-        }
+        .loading { text-align: center; padding: 4rem; color: var(--text-secondary); }
 
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 40px; height: 40px;
             margin: 0 auto 1.5rem;
             border: 3px solid var(--border-color);
             border-top-color: var(--accent-primary);
@@ -273,9 +169,7 @@
             animation: spin 1s linear infinite;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
+        @keyframes spin { to { transform: rotate(360deg); } }
 
         .error {
             background: rgba(239, 68, 68, 0.1);
@@ -293,11 +187,35 @@
             margin-top: 2rem;
             font-size: 0.875rem;
             font-family: 'JetBrains Mono', monospace;
-            padding: 1rem;
+            padding: 1rem 1rem 1.25rem;
             background: var(--bg-card);
             border-radius: 8px;
             border: 1px solid var(--border-color);
         }
+
+        .refresh-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.875rem;
+            padding: 0.55rem 1.3rem;
+            background: transparent;
+            border: 1px solid var(--accent-primary);
+            border-radius: 8px;
+            color: var(--accent-primary);
+            font-size: 0.875rem;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .refresh-btn:hover { background: rgba(59, 130, 246, 0.12); box-shadow: 0 0 12px rgba(59, 130, 246, 0.2); }
+        .refresh-btn:active { transform: scale(0.97); }
+
+        .refresh-btn .icon { display: inline-block; transition: transform 0.5s ease; }
+        .refresh-btn.loading .icon { animation: spin 0.8s linear infinite; }
+        .refresh-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
         .info-badge {
             display: inline-block;
@@ -311,25 +229,11 @@
         }
 
         @media (max-width: 768px) {
-            body {
-                padding: 1rem;
-            }
-
-            .header h1 {
-                font-size: 2rem;
-            }
-
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stat-card .value {
-                font-size: 2.5rem;
-            }
-
-            .chart-wrapper {
-                height: 300px;
-            }
+            body { padding: 1rem; }
+            .header h1 { font-size: 2rem; }
+            .stats-grid { grid-template-columns: 1fr; }
+            .stat-card .value { font-size: 2.5rem; }
+            .chart-wrapper { height: 300px; }
         }
     </style>
 </head>
@@ -391,54 +295,31 @@
 
         <div class="refresh-info">
             ⏱️ 5分ごとに自動更新 | 最終更新: <span id="last-update">--</span>
+            <br>
+            <button class="refresh-btn" id="refresh-btn" onclick="manualRefresh()">
+                <span class="icon">↻</span> 今すぐ更新
+            </button>
         </div>
     </div>
 
     <script>
-        // 同じディレクトリのsensor.jsonを参照（相対パス）
         const BLOB_URL = './sensor.json';
         let tempChart = null;
         let humChart = null;
 
-        // JSONLデータをパース
         function parseJSONL(text) {
-            return text
-                .trim()
-                .split('\n')
-                .map(line => {
-                    try {
-                        return JSON.parse(line);
-                    } catch (e) {
-                        return null;
-                    }
-                })
-                .filter(data => data !== null);
+            return text.trim().split('\n').map(line => {
+                try { return JSON.parse(line); } catch (e) { return null; }
+            }).filter(data => data !== null);
         }
 
-        // 時刻フォーマット
         function formatTime(timestamp) {
             const date = new Date(timestamp);
-            return date.toLocaleString('ja-JP', { 
-                month: '2-digit', 
-                day: '2-digit', 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
+            return date.toLocaleString('ja-JP', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
         }
 
-        function formatTimeShort(timestamp) {
-            const date = new Date(timestamp);
-            return date.toLocaleTimeString('ja-JP', { 
-                hour: '2-digit', 
-                minute: '2-digit' 
-            });
-        }
-
-        // データを取得して表示
         async function fetchAndDisplayData() {
             try {
-                // 末尾200KBのみ取得（24時間分 ≒ 1440件 × ~100bytes = ~144KB）
-                // 先頭行は途中から始まる可能性があるため parseJSONL 側で無効行を除外する
                 const FETCH_BYTES = 200 * 1024;
                 const url = BLOB_URL + '?t=' + Date.now();
                 let text;
@@ -447,12 +328,8 @@
                     const contentLength = parseInt(headRes.headers.get('Content-Length') || '0', 10);
                     if (contentLength > FETCH_BYTES) {
                         const start = contentLength - FETCH_BYTES;
-                        const rangeRes = await fetch(url, {
-                            headers: { 'Range': `bytes=${start}-` }
-                        });
-                        if (!rangeRes.ok && rangeRes.status !== 206) {
-                            throw new Error('データの取得に失敗しました');
-                        }
+                        const rangeRes = await fetch(url, { headers: { 'Range': `bytes=${start}-` } });
+                        if (!rangeRes.ok && rangeRes.status !== 206) throw new Error('データの取得に失敗しました');
                         text = await rangeRes.text();
                     } else {
                         const res = await fetch(url);
@@ -460,28 +337,20 @@
                         text = await res.text();
                     }
                 } else {
-                    // HEAD未対応の場合は全件取得にフォールバック
                     const res = await fetch(url);
                     if (!res.ok) throw new Error('データの取得に失敗しました');
                     text = await res.text();
                 }
 
                 const allData = parseJSONL(text);
+                if (allData.length === 0) throw new Error('データが見つかりません');
 
-                if (allData.length === 0) {
-                    throw new Error('データが見つかりません');
-                }
-
-                // 成功したデータのみを抽出
                 const successData = allData.filter(d => d.success && d.temperature !== null);
-
-                // 最新データ
                 const latest = allData[allData.length - 1];
 
-                // 現在の値を表示
                 const statusTemp = document.getElementById('status-temp');
                 const statusHum = document.getElementById('status-hum');
-                
+
                 if (latest.success) {
                     document.getElementById('current-temp').textContent = latest.temperature.toFixed(1);
                     document.getElementById('current-hum').textContent = latest.humidity.toFixed(1);
@@ -498,59 +367,28 @@
                     statusHum.className = 'status-indicator offline';
                 }
 
-                // 統計情報（コンソールログ用）
-                const successCount = successData.length;
-                const totalCount = allData.length;
-                const successRate = (successCount / totalCount * 100).toFixed(1);
-                console.log(`成功率: ${successRate}% (${successCount}/${totalCount})`);
-
-                // 過去24時間のデータを抽出
                 const now = new Date();
                 const last24Hours = now - (24 * 60 * 60 * 1000);
                 const recent24h = successData.filter(d => new Date(d.timestamp) > last24Hours);
 
-                // データを5分単位で丸め込んで平均値を計算
                 const dataByTime = new Map();
-                
                 recent24h.forEach(d => {
-                    // タイムスタンプを5分単位に丸め込み
-                    const timestamp = new Date(d.timestamp);
-                    const ms = timestamp.getTime();
+                    const ms = new Date(d.timestamp).getTime();
                     const roundedMs = Math.floor(ms / (5 * 60 * 1000)) * (5 * 60 * 1000);
-                    
-                    if (!dataByTime.has(roundedMs)) {
-                        dataByTime.set(roundedMs, {
-                            temperatures: [],
-                            humidities: []
-                        });
-                    }
-                    
+                    if (!dataByTime.has(roundedMs)) dataByTime.set(roundedMs, { temperatures: [], humidities: [] });
                     const bucket = dataByTime.get(roundedMs);
                     if (d.temperature !== null) bucket.temperatures.push(d.temperature);
                     if (d.humidity !== null) bucket.humidities.push(d.humidity);
                 });
-                
-                // 時系列順にソートして配列に変換
-                const sortedTimes = Array.from(dataByTime.keys()).sort((a, b) => a - b);
-                
-                // グラフデータの準備（各5分区間の平均値）
-                const timestamps = sortedTimes.map(t => new Date(t));
-                const tempData = sortedTimes.map(t => {
-                    const temps = dataByTime.get(t).temperatures;
-                    return temps.length > 0 ? temps.reduce((a, b) => a + b) / temps.length : null;
-                });
-                const humData = sortedTimes.map(t => {
-                    const hums = dataByTime.get(t).humidities;
-                    return hums.length > 0 ? hums.reduce((a, b) => a + b) / hums.length : null;
-                });
 
-                // グラフを更新
+                const sortedTimes = Array.from(dataByTime.keys()).sort((a, b) => a - b);
+                const timestamps = sortedTimes.map(t => new Date(t));
+                const tempData = sortedTimes.map(t => { const temps = dataByTime.get(t).temperatures; return temps.length > 0 ? temps.reduce((a, b) => a + b) / temps.length : null; });
+                const humData = sortedTimes.map(t => { const hums = dataByTime.get(t).humidities; return hums.length > 0 ? hums.reduce((a, b) => a + b) / hums.length : null; });
+
                 updateCharts(timestamps, tempData, humData);
 
-                // 最終更新時刻
                 document.getElementById('last-update').textContent = new Date().toLocaleTimeString('ja-JP');
-
-                // UIを表示
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('error').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
@@ -564,201 +402,107 @@
             }
         }
 
-        // 温度と湿度の2つのグラフを更新
+        async function manualRefresh() {
+            const btn = document.getElementById('refresh-btn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+            try {
+                await fetchAndDisplayData();
+            } finally {
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        }
+
         function updateCharts(timestamps, tempData, humData) {
-            // 6時間ごとのターゲット時刻を見つけて、最も近いデータポイントにラベルを付ける
             const targetHours = [0, 6, 12, 18];
             const labeledIndices = new Set();
-            
+
             targetHours.forEach(targetHour => {
                 let closestIndex = -1;
                 let minDiff = Infinity;
-                
                 timestamps.forEach((ts, index) => {
                     const date = new Date(ts);
-                    const hours = date.getHours();
-                    const minutes = date.getMinutes();
-                    const totalMinutes = hours * 60 + minutes;
-                    const targetMinutes = targetHour * 60;
-                    const diff = Math.abs(totalMinutes - targetMinutes);
-                    
-                    // 目標時刻から±3時間以内で最も近いポイントを探す
-                    if (diff < minDiff && diff < 180) {
-                        minDiff = diff;
-                        closestIndex = index;
-                    }
+                    const totalMinutes = date.getHours() * 60 + date.getMinutes();
+                    const diff = Math.abs(totalMinutes - targetHour * 60);
+                    if (diff < minDiff && diff < 180) { minDiff = diff; closestIndex = index; }
                 });
-                
-                if (closestIndex !== -1) {
-                    labeledIndices.add(closestIndex);
-                }
+                if (closestIndex !== -1) labeledIndices.add(closestIndex);
             });
-            
+
             const labels = timestamps.map((ts, index) => {
-                if (labeledIndices.has(index)) {
-                    const date = new Date(ts);
-                    const hours = date.getHours();
-                    return hours + ':00';
-                }
+                if (labeledIndices.has(index)) { return new Date(ts).getHours() + ':00'; }
                 return '';
             });
 
             const commonOptions = {
                 responsive: true,
                 maintainAspectRatio: false,
-                interaction: {
-                    mode: 'index',
-                    intersect: false,
-                },
+                interaction: { mode: 'index', intersect: false },
                 plugins: {
-                    legend: {
-                        display: false
-                    },
+                    legend: { display: false },
                     tooltip: {
                         backgroundColor: 'rgba(26, 31, 58, 0.95)',
-                        titleColor: '#f3f4f6',
-                        bodyColor: '#f3f4f6',
-                        borderColor: '#2d3250',
-                        borderWidth: 1,
-                        padding: 12,
-                        displayColors: true,
-                        titleFont: {
-                            family: 'JetBrains Mono',
-                            size: 12
-                        },
-                        bodyFont: {
-                            family: 'Inter',
-                            size: 13
-                        },
+                        titleColor: '#f3f4f6', bodyColor: '#f3f4f6',
+                        borderColor: '#2d3250', borderWidth: 1, padding: 12,
+                        titleFont: { family: 'JetBrains Mono', size: 12 },
+                        bodyFont: { family: 'Inter', size: 13 },
                         callbacks: {
                             title: function(context) {
-                                const index = context[0].dataIndex;
-                                const date = new Date(timestamps[index]);
-                                return date.toLocaleString('ja-JP');
+                                return new Date(timestamps[context[0].dataIndex]).toLocaleString('ja-JP');
                             }
                         }
                     }
                 },
                 scales: {
                     x: {
-                        grid: {
-                            color: 'rgba(45, 50, 80, 0.5)',
-                            drawBorder: false
-                        },
+                        grid: { color: 'rgba(45, 50, 80, 0.5)', drawBorder: false },
                         ticks: {
                             color: '#9ca3af',
-                            font: {
-                                family: 'JetBrains Mono',
-                                size: 11
-                            },
-                            autoSkip: false,
-                            maxRotation: 0,
-                            callback: function(value, index) {
-                                return labels[index];
-                            }
+                            font: { family: 'JetBrains Mono', size: 11 },
+                            autoSkip: false, maxRotation: 0,
+                            callback: function(value, index) { return labels[index]; }
                         }
                     },
                     y: {
-                        grid: {
-                            color: 'rgba(45, 50, 80, 0.5)',
-                            drawBorder: false
-                        },
-                        ticks: {
-                            font: {
-                                family: 'Inter',
-                                size: 11,
-                                weight: '500'
-                            }
-                        }
+                        grid: { color: 'rgba(45, 50, 80, 0.5)', drawBorder: false },
+                        ticks: { font: { family: 'Inter', size: 11, weight: '500' } }
                     }
                 }
             };
 
-            // 温度グラフ
-            if (tempChart) {
-                tempChart.destroy();
-            }
+            if (tempChart) tempChart.destroy();
             const tempCtx = document.getElementById('tempChart').getContext('2d');
             tempChart = new Chart(tempCtx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels,
                     datasets: [{
-                        label: '温度',
-                        data: tempData,
-                        borderColor: '#f59e0b',
-                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        pointHoverRadius: 6,
+                        label: '温度', data: tempData,
+                        borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 6
                     }]
                 },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        ...commonOptions.scales,
-                        y: {
-                            ...commonOptions.scales.y,
-                            ticks: {
-                                ...commonOptions.scales.y.ticks,
-                                color: '#f59e0b',
-                                callback: function(value) {
-                                    return value.toFixed(1) + '°C';
-                                }
-                            }
-                        }
-                    }
-                }
+                options: { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, ticks: { ...commonOptions.scales.y.ticks, color: '#f59e0b', callback: v => v.toFixed(1) + '°C' } } } }
             });
 
-            // 湿度グラフ
-            if (humChart) {
-                humChart.destroy();
-            }
+            if (humChart) humChart.destroy();
             const humCtx = document.getElementById('humChart').getContext('2d');
             humChart = new Chart(humCtx, {
                 type: 'line',
                 data: {
-                    labels: labels,
+                    labels,
                     datasets: [{
-                        label: '湿度',
-                        data: humData,
-                        borderColor: '#06b6d4',
-                        backgroundColor: 'rgba(6, 182, 212, 0.1)',
-                        borderWidth: 2,
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 0,
-                        pointHoverRadius: 6,
+                        label: '湿度', data: humData,
+                        borderColor: '#06b6d4', backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                        borderWidth: 2, fill: true, tension: 0.4, pointRadius: 0, pointHoverRadius: 6
                     }]
                 },
-                options: {
-                    ...commonOptions,
-                    scales: {
-                        ...commonOptions.scales,
-                        y: {
-                            ...commonOptions.scales.y,
-                            ticks: {
-                                ...commonOptions.scales.y.ticks,
-                                color: '#06b6d4',
-                                callback: function(value) {
-                                    return value.toFixed(0) + '%';
-                                }
-                            },
-                            min: 0,
-                            max: 100
-                        }
-                    }
-                }
+                options: { ...commonOptions, scales: { ...commonOptions.scales, y: { ...commonOptions.scales.y, ticks: { ...commonOptions.scales.y.ticks, color: '#06b6d4', callback: v => v.toFixed(0) + '%' }, min: 0, max: 100 } } }
             });
         }
 
-        // 初回読み込み
         fetchAndDisplayData();
-
-        // 5分ごとに自動更新
         setInterval(fetchAndDisplayData, 5 * 60 * 1000);
     </script>
 </body>

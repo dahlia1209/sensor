@@ -188,6 +188,99 @@ tail -n 100 ~/src/sensor/logs/sensor.log
 tail -f ~/src/sensor/logs/service.log
 ```
 
+## 赤外線リモコン制御
+
+`irrp.py`（pigpio作者提供）を使ってエアコン・テレビ・照明などを赤外線で操作します。
+
+### ハードウェア接続
+
+- **IR受信モジュール** → GPIO17（物理ピン11）
+- **IR送信モジュール** → GPIO18（物理ピン12）
+- **VCC** → 5V（物理ピン2または4）
+- **GND** → GND
+
+### irrp.py のインストール
+
+```bash
+curl http://abyz.me.uk/rpi/pigpio/code/irrp_py.zip | zcat > irrp.py
+```
+
+### 信号の学習（受信）
+
+リモコンの信号を学習して `codes` ファイルに保存します。
+
+```bash
+python3 irrp.py -r -g17 -f codes {button name} --no-confirm --post 130
+```
+
+実行後「Press key for '{button name}'」と表示されたら、IR受信モジュールに向けてリモコンのボタンを押してください。
+
+**複数ボタンをまとめて登録する場合:**
+
+```bash
+python3 irrp.py -r -g17 -f codes \
+  aircon:cool \
+  aircon:heat \
+  aircon:off \
+  --no-confirm --post 130
+```
+
+**登録済みボタン一覧:**
+
+| ボタン名 | 説明 |
+|----------|------|
+| `aircon:cool` | エアコン 冷房 |
+| `aircon:heat` | エアコン 暖房 |
+| `aircon:dry` | エアコン 除湿 |
+| `aircon:off` | エアコン 停止 |
+| `aircon:temp_up` | エアコン 温度UP |
+| `aircon:temp_down` | エアコン 温度DOWN |
+| `aircon:wind_volume` | エアコン 風量 |
+| `aircon:wind_direction` | エアコン 風向 |
+| `aircon:timer_on` | エアコン 入タイマー |
+| `aircon:sleep_off` | エアコン おやすみ切 |
+| `aircon:clean` | エアコン 内部洗浄 |
+| `light:on` | リビング照明 ON |
+| `light:off` | リビング照明 OFF |
+| `tv:on` | テレビ ON |
+| `tv:off` | テレビ OFF |
+
+### 信号の送信
+
+```bash
+python3 irrp.py -p -g18 -f codes {button name}
+```
+
+例：
+
+```bash
+# エアコン冷房ON
+python3 irrp.py -p -g18 -f codes aircon:cool
+
+# 照明OFF
+python3 irrp.py -p -g18 -f codes light:off
+```
+
+### 登録済みキーの確認
+
+```bash
+python3 -c "import json; print(list(json.load(open('codes')).keys()))"
+```
+
+### 登録済みキーの削除
+
+```bash
+python3 -c "
+import json
+with open('codes', 'r') as f:
+    codes = json.load(f)
+codes.pop('削除したいキー名', None)
+with open('codes', 'w') as f:
+    json.dump(codes, f)
+print('削除完了。残りのキー:', list(codes.keys()))
+"
+```
+
 ## 定期アップロード設定
 
 ### 手動アップロード（センサーログ）
@@ -261,6 +354,8 @@ sensor/
 ├── README.md                  # このファイル
 ├── requirements.txt           # 依存パッケージ
 ├── main.py                    # メインプログラム
+├── irrp.py                    # 赤外線送受信スクリプト（pigpio作者提供）
+├── codes                      # 学習済み赤外線コード（自動生成）
 ├── html/
 │   └── index.html            # ダッシュボード画面
 ├── models/
@@ -410,6 +505,7 @@ tail -f ~/src/sensor/logs/upload_all.log
 - センサー: AM2302 (DHT22)
 - ライブラリ: adafruit-circuitpython-dht
 - クラウド: Azure Blob Storage (Append Blob)
+- 赤外線制御: [irrp.py](http://abyz.me.uk/rpi/pigpio/code/irrp_py.zip)（pigpio作者提供）
 
 ## ライセンス
 
